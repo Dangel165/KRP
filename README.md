@@ -1,6 +1,6 @@
 # KRP (Korean Programming Language)
 
-파이썬처럼 쉽고 한국어로 작성할 수 있는 프로그래밍 언어입니다.
+파이썬으로 만든 쉽고 한국어로 작성할 수 있는 프로그래밍 언어입니다.
 
 ## 특징
 
@@ -36,24 +36,6 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-### LLVM 설치 (선택사항)
-
-LLVM 컴파일 기능을 사용하려면:
-
-```bash
-# Windows
-# https://releases.llvm.org/ 에서 다운로드
-
-# Linux
-sudo apt-get install llvm-14 llvm-14-dev
-
-# macOS
-brew install llvm
-
-# Python LLVM 바인딩
-pip install llvmlite
-```
-
 ## 사용법
 
 ### GUI IDE (추천)
@@ -72,29 +54,6 @@ Python IDLE 스타일의 통합 개발 환경:
 - 즉시 실행 (F5)
 - 컴파일 (F6)
 - 예제 코드 포함
-
-### 파일 컴파일 (CLI)
-
-```bash
-# 기본 컴파일
-krp examples/hello.한글
-
-# 출력 파일 지정
-krp examples/hello.한글 -o hello.o
-
-# LLVM IR 확인
-krp examples/hello.한글 --show-ir
-
-# 실행 파일 생성
-gcc hello.o -o hello
-./hello
-```
-
-### 대화형 모드 (REPL)
-
-```bash
-krp --repl
-```
 
 ## 문법 예제
 
@@ -386,48 +345,3 @@ krp/
 - **백엔드**: LLVM (선택사항)
 - **GUI**: tkinter
 - **최적화**: LLVM Optimization Passes
-
-## 버전 히스토리
-
-### v3.0.0 (2024)
-- ✨ 표준 라이브러리 추가 (수학, 문자열, 리스트, 랜덤, 시간)
-- ✨ 리스트/배열 지원 (`[1, 2, 3]`)
-- ✨ 딕셔너리 지원 (`{"키": "값"}`)
-- ✨ 클래스 기본 구조 지원 (`클래스` 키워드)
-- ✨ 모듈 시스템 기본 구현 (`가져오기` 키워드)
-- ✨ 패키지 관리자 `krp-pkg` 추가
-- ✨ 리스트 인덱스 접근 및 수정
-- ✨ 멤버 접근 연산자 (`.`)
-- 📚 예제 파일 추가 (list_example, dict_example, stdlib_example)
-
-### v2.0.0 (2024)
-- KRP로 리브랜딩
-- 패키지 이름 변경: `korean-lang` → `krp`
-- 명령어 변경: `korean-lang` → `krp`, `korean-ide` → `krp-ide`
-- IDE 제목 업데이트
-
-### v1.0.1 (2024)
-- 파서 버그 수정 (보여줘 문 인식 개선)
-- 인터프리터 반환값 전파 수정
-- 반복문 무한 루프 문제 해결
-
-### v1.0.0 (2024)
-- 초기 릴리스
-- 기본 문법 구현
-- LLVM 컴파일러
-- 인터프리터
-- GUI IDE
-
-## 라이선스
-
-MIT License
-
-## 기여
-
-이슈와 풀 리퀘스트를 환영합니다!
-
-## 참고
-
-- [LLVM Documentation](https://llvm.org/docs/)
-- [ANTLR4 Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
-- [llvmlite Documentation](https://llvmlite.readthedocs.io/)
