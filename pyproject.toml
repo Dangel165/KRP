@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "krp"
+version = "2.0.0"
+description = "KRP (Korean Programming Language) - 한국어 프로그래밍 언어"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "KRP Team"}
+]
+keywords = ["krp", "korean", "programming", "language", "compiler", "interpreter", "한글", "한국어"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+llvm = ["llvmlite>=0.40.0"]
+all = ["llvmlite>=0.40.0"]
+
+[project.scripts]
+krp = "main:main"
+krp-ide = "ide:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/krp"
+Documentation = "https://github.com/yourusername/krp/blob/main/README.md"
+Repository = "https://github.com/yourusername/krp"
+
+[tool.setuptools]
+py-modules = ["main", "ide"]
+packages = ["compiler"]
+include-package-data = true

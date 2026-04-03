@@ -1,3 +1,34 @@
+Metadata-Version: 2.4
+Name: krp
+Version: 2.0.0
+Summary: KRP (Korean Programming Language) - 한국어 프로그래밍 언어
+Home-page: https://github.com/yourusername/krp
+Author: KRP Team
+Author-email: 
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/krp
+Project-URL: Documentation, https://github.com/yourusername/krp/blob/main/README.md
+Project-URL: Repository, https://github.com/yourusername/krp
+Keywords: krp,korean,programming,language,compiler,interpreter,한글,한국어
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: llvm
+Requires-Dist: llvmlite>=0.40.0; extra == "llvm"
+Provides-Extra: all
+Requires-Dist: llvmlite>=0.40.0; extra == "all"
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
 # KRP (Korean Programming Language)
 
 파이썬처럼 쉽고 한국어로 작성할 수 있는 프로그래밍 언어입니다.

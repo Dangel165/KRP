@@ -1,0 +1,8 @@
+include README.md
+include LICENSE
+include requirements.txt
+include GUIDE.md
+include IDE_GUIDE.md
+recursive-include examples *.한글
+recursive-include grammar *.g4
+recursive-include compiler *.py

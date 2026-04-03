@@ -1,0 +1,6 @@
+
+[all]
+llvmlite>=0.40.0
+
+[llvm]
+llvmlite>=0.40.0

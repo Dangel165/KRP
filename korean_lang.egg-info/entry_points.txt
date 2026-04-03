@@ -1,0 +1,3 @@
+[console_scripts]
+korean-ide = ide:main
+korean-lang = main:main

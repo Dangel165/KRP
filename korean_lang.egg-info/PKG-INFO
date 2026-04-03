@@ -1,4 +1,35 @@
-# KRP (Korean Programming Language)
+Metadata-Version: 2.4
+Name: korean-lang
+Version: 1.0.1
+Summary: 한국어 기반 프로그래밍 언어
+Home-page: https://github.com/yourusername/korean-lang
+Author: Korean Lang Team
+Author-email: 
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/korean-lang
+Project-URL: Documentation, https://github.com/yourusername/korean-lang/blob/main/README.md
+Project-URL: Repository, https://github.com/yourusername/korean-lang
+Keywords: korean,programming,language,compiler,interpreter,한글,한국어
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: llvm
+Requires-Dist: llvmlite>=0.40.0; extra == "llvm"
+Provides-Extra: all
+Requires-Dist: llvmlite>=0.40.0; extra == "all"
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# 한국어 프로그래밍 언어 (Korean Programming Language)
 
 파이썬처럼 쉽고 한국어로 작성할 수 있는 프로그래밍 언어입니다.
 
@@ -11,42 +42,18 @@
 
 ## 설치
 
-### pip로 설치 (권장)
-
 ```bash
-pip install krp
-```
-
-### 소스에서 설치
-
-```bash
-# 저장소 클론
-git clone https://github.com/yourusername/krp.git
-cd krp
-
 # 의존성 설치
 pip install -r requirements.txt
 
-# 패키지 설치
-pip install -e .
-```
-
-### LLVM 설치 (선택사항)
-
-LLVM 컴파일 기능을 사용하려면:
-
-```bash
-# Windows
+# LLVM 설치 (Windows)
 # https://releases.llvm.org/ 에서 다운로드
 
-# Linux
+# LLVM 설치 (Linux)
 sudo apt-get install llvm-14 llvm-14-dev
 
-# macOS
+# LLVM 설치 (macOS)
 brew install llvm
-
-# Python LLVM 바인딩
-pip install llvmlite
 ```
 
 ## 사용법
@@ -54,10 +61,10 @@ pip install llvmlite
 ### GUI IDE (추천)
 
 ```bash
-# 설치 후
-krp-ide
+# Windows
+run_ide.bat
 
-# 또는 소스에서
+# Linux/Mac
 python ide.py
 ```
 
@@ -72,13 +79,13 @@ Python IDLE 스타일의 통합 개발 환경:
 
 ```bash
 # 기본 컴파일
-krp examples/hello.한글
+python main.py examples/hello.한글
 
 # 출력 파일 지정
-krp examples/hello.한글 -o hello.o
+python main.py examples/hello.한글 -o hello.o
 
 # LLVM IR 확인
-krp examples/hello.한글 --show-ir
+python main.py examples/hello.한글 --show-ir
 
 # 실행 파일 생성
 gcc hello.o -o hello
@@ -88,7 +95,7 @@ gcc hello.o -o hello
 ### 대화형 모드 (REPL)
 
 ```bash
-krp --repl
+python main.py --repl
 ```
 
 ## 문법 예제
@@ -182,11 +189,10 @@ krp --repl
 ## 프로젝트 구조
 
 ```
-krp/
+korean_lang/
 ├── compiler/           # 컴파일러 코어
 │   ├── lexer.py       # 렉서 (토큰화)
 │   ├── parser.py      # 파서 (AST 생성)
-│   ├── interpreter.py # 인터프리터
 │   └── codegen.py     # 코드 생성 (LLVM IR)
 ├── grammar/           # ANTLR 문법 정의
 │   └── Korean.g4      # 언어 문법
@@ -195,8 +201,9 @@ krp/
 │   ├── fibonacci.한글
 │   ├── loop.한글
 │   └── conditional.한글
-├── main.py            # CLI 실행 파일
-├── ide.py             # GUI IDE
+├── tests/             # 테스트
+├── runtime/           # 런타임 라이브러리
+├── main.py            # 메인 실행 파일
 ├── requirements.txt   # 의존성
 └── README.md          # 문서
 ```
@@ -206,43 +213,20 @@ krp/
 - [x] 기본 문법 설계
 - [x] 렉서 구현
 - [x] 파서 구현
-- [x] 인터프리터 구현
 - [x] LLVM IR 코드 생성
-- [x] GUI IDE
-- [x] pip 패키지 배포
 - [ ] 표준 라이브러리
 - [ ] 배열/리스트 지원
 - [ ] 클래스/객체 지원
 - [ ] 모듈 시스템
 - [ ] 패키지 관리자
+- [ ] IDE 플러그인
 
 ## 기술 스택
 
 - **구현 언어**: Python 3.8+
 - **파서 생성기**: ANTLR4
-- **백엔드**: LLVM (선택사항)
-- **GUI**: tkinter
+- **백엔드**: LLVM
 - **최적화**: LLVM Optimization Passes
-
-## 버전 히스토리
-
-### v2.0.0 (2024)
-- KRP로 리브랜딩
-- 패키지 이름 변경: `korean-lang` → `krp`
-- 명령어 변경: `korean-lang` → `krp`, `korean-ide` → `krp-ide`
-- IDE 제목 업데이트
-
-### v1.0.1 (2024)
-- 파서 버그 수정 (보여줘 문 인식 개선)
-- 인터프리터 반환값 전파 수정
-- 반복문 무한 루프 문제 해결
-
-### v1.0.0 (2024)
-- 초기 릴리스
-- 기본 문법 구현
-- LLVM 컴파일러
-- 인터프리터
-- GUI IDE
 
 ## 라이선스
 

@@ -1,0 +1,3 @@
+[console_scripts]
+krp = main:main
+krp-ide = ide:main
