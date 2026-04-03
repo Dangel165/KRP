@@ -33,14 +33,14 @@ except ImportError:
 class KoreanIDE:
     def __init__(self, root):
         self.root = root
-        self.root.title("KRP IDE v2.0")
+        self.root.title("KRP IDE v3.0")
         self.root.geometry("1200x800")
         
         self.current_file = None
         self.modified = False
         
         # 한국어 키워드
-        self.keywords = ['변수', '함수', '만약', '아니면', '반복', '반환', '보여줘', '참', '거짓']
+        self.keywords = ['변수', '함수', '만약', '아니면', '반복', '반환', '보여줘', '참', '거짓', '클래스', '가져오기', '에서']
         
         self.create_menu()
         self.create_toolbar()
@@ -214,7 +214,7 @@ class KoreanIDE:
     
     def update_title(self):
         # 제목 업데이트
-        title = "KRP IDE v2.0"
+        title = "KRP IDE v3.0"
         if self.current_file:
             title += f" - {self.current_file}"
         if self.modified:
@@ -485,12 +485,18 @@ KRP 문법 가이드
     def show_examples(self):
         examples_window = tk.Toplevel(self.root)
         examples_window.title("예제 코드")
-        examples_window.geometry("600x400")
+        examples_window.geometry("800x600")
         
-        examples_text = scrolledtext.ScrolledText(examples_window, wrap=tk.WORD, font=('Consolas', 10))
-        examples_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        # 탭 생성
+        notebook = ttk.Notebook(examples_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        examples = """
+        # 기본 예제
+        basic_frame = ttk.Frame(notebook)
+        notebook.add(basic_frame, text="기본")
+        basic_text = scrolledtext.ScrolledText(basic_frame, wrap=tk.WORD, font=('Consolas', 10))
+        basic_text.pack(fill=tk.BOTH, expand=True)
+        basic_examples = """
 # 예제 1: Hello World
 보여줘("안녕하세요, 세계!")
 
@@ -511,7 +517,7 @@ KRP 문법 가이드
 변수 i = 1
 반복 i <= 5:
     보여줘(i)
-    변수 i = i + 1
+    i = i + 1
 
 # 예제 5: 함수
 함수 피보나치(n):
@@ -523,15 +529,225 @@ KRP 문법 가이드
 변수 결과 = 피보나치(10)
 보여줘(결과)
 """
-        examples_text.insert('1.0', examples)
-        examples_text.config(state='disabled')
+        basic_text.insert('1.0', basic_examples)
+        basic_text.config(state='disabled')
+        
+        # 리스트 예제
+        list_frame = ttk.Frame(notebook)
+        notebook.add(list_frame, text="리스트")
+        list_text = scrolledtext.ScrolledText(list_frame, wrap=tk.WORD, font=('Consolas', 10))
+        list_text.pack(fill=tk.BOTH, expand=True)
+        list_examples = """
+# 리스트 생성
+변수 숫자목록 = [1, 2, 3, 4, 5]
+보여줘(숫자목록)
+
+# 리스트 인덱스 접근
+보여줘(숫자목록[0])  # 첫 번째 요소
+보여줘(숫자목록[2])  # 세 번째 요소
+
+# 리스트에 요소 추가
+추가(숫자목록, 6)
+보여줘(숫자목록)
+
+# 리스트 길이
+보여줘(길이(숫자목록))
+
+# 리스트 정렬
+변수 무작위 = [5, 2, 8, 1, 9]
+변수 정렬됨 = 정렬(무작위)
+보여줘(정렬됨)
+
+# 리스트 뒤집기
+변수 뒤집힌 = 뒤집기(숫자목록)
+보여줘(뒤집힌)
+
+# 문자열 리스트
+변수 과일 = ["사과", "바나나", "오렌지"]
+보여줘(과일[1])
+
+# 리스트 반복
+변수 i = 0
+반복 (i < 길이(과일)):
+    보여줘(과일[i])
+    i = i + 1
+"""
+        list_text.insert('1.0', list_examples)
+        list_text.config(state='disabled')
+        
+        # 딕셔너리 예제
+        dict_frame = ttk.Frame(notebook)
+        notebook.add(dict_frame, text="딕셔너리")
+        dict_text = scrolledtext.ScrolledText(dict_frame, wrap=tk.WORD, font=('Consolas', 10))
+        dict_text.pack(fill=tk.BOTH, expand=True)
+        dict_examples = """
+# 딕셔너리 생성
+변수 학생 = {"이름": "홍길동", "나이": 20, "학년": 3}
+보여줘(학생)
+
+# 딕셔너리 값 접근
+보여줘(학생["이름"])
+보여줘(학생["나이"])
+
+# 딕셔너리 수정
+학생["나이"] = 21
+보여줘(학생)
+
+# 새 키-값 추가
+학생["전공"] = "컴퓨터공학"
+보여줘(학생)
+
+# 성적 관리 예제
+변수 성적표 = {
+    "국어": 90,
+    "영어": 85,
+    "수학": 95
+}
+
+보여줘("국어 점수: " + 문자변환(성적표["국어"]))
+보여줘("영어 점수: " + 문자변환(성적표["영어"]))
+보여줘("수학 점수: " + 문자변환(성적표["수학"]))
+"""
+        dict_text.insert('1.0', dict_examples)
+        dict_text.config(state='disabled')
+        
+        # 표준 라이브러리 예제
+        stdlib_frame = ttk.Frame(notebook)
+        notebook.add(stdlib_frame, text="표준 라이브러리")
+        stdlib_text = scrolledtext.ScrolledText(stdlib_frame, wrap=tk.WORD, font=('Consolas', 10))
+        stdlib_text.pack(fill=tk.BOTH, expand=True)
+        stdlib_examples = """
+# 수학 함수
+보여줘("제곱근(16): " + 문자변환(제곱근(16)))
+보여줘("절댓값(-5): " + 문자변환(절댓값(-5)))
+보여줘("거듭제곱(2, 10): " + 문자변환(거듭제곱(2, 10)))
+보여줘("최댓값(3, 7, 2, 9, 1): " + 문자변환(최댓값(3, 7, 2, 9, 1)))
+보여줘("최솟값(3, 7, 2, 9, 1): " + 문자변환(최솟값(3, 7, 2, 9, 1)))
+
+# 문자열 함수
+변수 문자열 = "안녕하세요"
+보여줘("문자열 길이: " + 문자변환(길이(문자열)))
+
+변수 영어 = "Hello World"
+보여줘("대문자: " + 대문자(영어))
+보여줘("소문자: " + 소문자(영어))
+
+# 리스트 함수
+변수 목록 = [5, 2, 8, 1, 9]
+보여줘("정렬 전: ")
+보여줘(목록)
+보여줘("정렬 후: ")
+보여줘(정렬(목록))
+
+# 랜덤 함수
+보여줘("1부터 100까지 정수난수:")
+보여줘(정수난수(1, 100))
+
+변수 선택지 = ["가위", "바위", "보"]
+보여줘("랜덤 선택:")
+보여줘(선택(선택지))
+
+# 타입 변환
+변수 숫자 = 42
+변수 문자 = 문자변환(숫자)
+보여줘("숫자를 문자로: " + 문자)
+
+변수 문자숫자 = "123"
+변수 정수 = 정수변환(문자숫자)
+보여줘("문자를 정수로: " + 문자변환(정수 + 10))
+"""
+        stdlib_text.insert('1.0', stdlib_examples)
+        stdlib_text.config(state='disabled')
+        
+        # 종합 예제
+        advanced_frame = ttk.Frame(notebook)
+        notebook.add(advanced_frame, text="종합 예제")
+        advanced_text = scrolledtext.ScrolledText(advanced_frame, wrap=tk.WORD, font=('Consolas', 10))
+        advanced_text.pack(fill=tk.BOTH, expand=True)
+        advanced_examples = """
+# 학생 관리 시스템
+
+# 학생 데이터 (딕셔너리 리스트)
+변수 학생들 = [
+    {"이름": "홍길동", "점수": [90, 85, 95]},
+    {"이름": "김철수", "점수": [88, 92, 87]},
+    {"이름": "이영희", "점수": [95, 90, 93]}
+]
+
+# 평균 계산 함수
+함수 평균계산(점수목록):
+    변수 합계 = 0
+    변수 i = 0
+    반복 (i < 길이(점수목록)):
+        합계 = 합계 + 점수목록[i]
+        i = i + 1
+    반환 합계 / 길이(점수목록)
+
+# 모든 학생 정보 출력
+보여줘("=== 학생 성적표 ===")
+변수 i = 0
+반복 (i < 길이(학생들)):
+    변수 학생 = 학생들[i]
+    보여줘("이름: " + 학생["이름"])
+    
+    변수 평균 = 평균계산(학생["점수"])
+    보여줘("평균 점수: " + 문자변환(반올림(평균)))
+    보여줘("---")
+    
+    i = i + 1
+
+# 최고 점수 학생 찾기
+변수 최고평균 = 0
+변수 최고학생 = ""
+변수 j = 0
+
+반복 (j < 길이(학생들)):
+    변수 학생 = 학생들[j]
+    변수 평균 = 평균계산(학생["점수"])
+    
+    만약 (평균 > 최고평균):
+        최고평균 = 평균
+        최고학생 = 학생["이름"]
+    
+    j = j + 1
+
+보여줘("최고 성적 학생: " + 최고학생)
+보여줘("평균 점수: " + 문자변환(반올림(최고평균)))
+"""
+        advanced_text.insert('1.0', advanced_examples)
+        advanced_text.config(state='disabled')
+        
+        # 버튼 프레임
+        button_frame = ttk.Frame(examples_window)
+        button_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        def load_example():
+            current_tab = notebook.index(notebook.select())
+            texts = [basic_text, list_text, dict_text, stdlib_text, advanced_text]
+            example_code = texts[current_tab].get('1.0', 'end-1c')
+            self.editor_text.delete('1.0', 'end')
+            self.editor_text.insert('1.0', example_code)
+            self.highlight_syntax()
+            self.update_line_numbers()
+            examples_window.destroy()
+        
+        ttk.Button(button_frame, text="에디터에 불러오기", command=load_example).pack(side=tk.RIGHT, padx=5)
+        ttk.Button(button_frame, text="닫기", command=examples_window.destroy).pack(side=tk.RIGHT)
     
     def show_about(self):
         about_text = f"""
-KRP IDE v2.0
+KRP IDE v3.0
 
 KRP (Korean Programming Language)
 Python으로 작성된 한국어 기반 프로그래밍 언어
+
+새로운 기능 (v3.0):
+✨ 표준 라이브러리 (40+ 함수)
+✨ 리스트/배열 지원
+✨ 딕셔너리 지원
+✨ 클래스 기본 구조
+✨ 모듈 시스템
+✨ 패키지 관리자 (krp-pkg)
 
 기능:
 - 한국어 키워드 지원
@@ -539,6 +755,7 @@ Python으로 작성된 한국어 기반 프로그래밍 언어
 - 인터프리터 실행 (F5)
 {"- LLVM 컴파일 (F6)" if LLVM_AVAILABLE else "- LLVM 컴파일 (비활성화 - llvmlite 필요)"}
 - 파일 저장/불러오기
+- 다양한 예제 코드
 
 단축키:
 - Ctrl+N: 새 파일
@@ -551,6 +768,10 @@ Python으로 작성된 한국어 기반 프로그래밍 언어
 상태:
 - 인터프리터: {"사용 가능" if INTERPRETER_AVAILABLE else "사용 불가"}
 - LLVM 컴파일: {"사용 가능" if LLVM_AVAILABLE else "사용 불가 (install_dependencies.bat 실행 필요)"}
+
+더 많은 정보:
+- 도움말 > 문법 가이드
+- 도움말 > 예제 코드
 """
         messagebox.showinfo("정보", about_text)
     

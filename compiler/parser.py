@@ -83,6 +83,35 @@ class FunctionCall(ASTNode):
 class ReturnStatement(ASTNode):
     value: ASTNode
 
+@dataclass
+class ListLiteral(ASTNode):
+    elements: List[ASTNode]
+
+@dataclass
+class DictLiteral(ASTNode):
+    pairs: List[tuple]  # [(key, value), ...]
+
+@dataclass
+class IndexAccess(ASTNode):
+    object: ASTNode
+    index: ASTNode
+
+@dataclass
+class MemberAccess(ASTNode):
+    object: ASTNode
+    member: str
+
+@dataclass
+class ClassDeclaration(ASTNode):
+    name: str
+    methods: List[ASTNode]
+    attributes: List[ASTNode]
+
+@dataclass
+class ImportStatement(ASTNode):
+    module: str
+    items: Optional[List[str]] = None
+
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
@@ -140,6 +169,10 @@ class Parser:
             return self.parse_while_statement()
         elif token.type == TokenType.FUNC:
             return self.parse_function_declaration()
+        elif token.type == TokenType.CLASS:
+            return self.parse_class_declaration()
+        elif token.type == TokenType.IMPORT:
+            return self.parse_import_statement()
         elif token.type == TokenType.RETURN:
             return self.parse_return_statement()
         elif token.type == TokenType.IDENTIFIER:
@@ -148,6 +181,9 @@ class Parser:
                 return self.parse_function_call()
             elif self.peek_token().type == TokenType.ASSIGN:
                 return self.parse_assignment()
+            elif self.peek_token().type == TokenType.LBRACKET:
+                # 리스트 인덱스 할당
+                return self.parse_index_assignment()
         elif token.type == TokenType.NEWLINE:
             self.advance()
             return None
@@ -201,36 +237,57 @@ class Parser:
         self.expect(TokenType.COLON)
         self.skip_newlines()
         
+        # then 블록 파싱 - column 기반 들여쓰기
         then_block = []
+        base_column = None
+        
         while self.current_token().type not in [TokenType.ELSE, TokenType.EOF]:
             if self.current_token().type == TokenType.NEWLINE:
                 self.advance()
-                if self.current_token().type in [TokenType.ELSE, TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT]:
-                    break
                 continue
+            
+            # 첫 문장의 column 저장
+            if base_column is None:
+                base_column = self.current_token().column
+            
+            # ELSE 키워드 체크 (같은 레벨)
+            if self.current_token().type == TokenType.ELSE:
+                break
+            
+            # 현재 토큰의 column이 base_column보다 작으면 블록 종료
+            if self.current_token().column < base_column:
+                break
+            
             stmt = self.parse_statement()
             if stmt:
                 then_block.append(stmt)
-            if self.current_token().type in [TokenType.ELSE, TokenType.EOF]:
-                break
         
+        # else 블록 파싱
         else_block = None
         if self.current_token().type == TokenType.ELSE:
             self.expect(TokenType.ELSE)
             self.expect(TokenType.COLON)
             self.skip_newlines()
+            
             else_block = []
+            base_column = None
+            
             while self.current_token().type != TokenType.EOF:
                 if self.current_token().type == TokenType.NEWLINE:
                     self.advance()
-                    if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT]:
-                        break
                     continue
+                
+                # 첫 문장의 column 저장
+                if base_column is None:
+                    base_column = self.current_token().column
+                
+                # 현재 토큰의 column이 base_column보다 작으면 블록 종료
+                if self.current_token().column < base_column:
+                    break
+                
                 stmt = self.parse_statement()
                 if stmt:
                     else_block.append(stmt)
-                if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT, TokenType.EOF]:
-                    break
         
         return IfStatement(condition, then_block, else_block)
     
@@ -250,18 +307,27 @@ class Parser:
         self.expect(TokenType.COLON)
         self.skip_newlines()
         
+        # 블록 파싱 - 첫 문장의 column을 기준으로 들여쓰기 판단
         body = []
+        base_column = None
+        
         while self.current_token().type != TokenType.EOF:
+            # 빈 줄 건너뛰기
             if self.current_token().type == TokenType.NEWLINE:
                 self.advance()
-                if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT]:
-                    break
                 continue
+            
+            # 첫 문장의 column 저장
+            if base_column is None:
+                base_column = self.current_token().column
+            
+            # 현재 토큰의 column이 base_column보다 작으면 블록 종료
+            if self.current_token().column < base_column:
+                break
+            
             stmt = self.parse_statement()
             if stmt:
                 body.append(stmt)
-            if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT, TokenType.EOF]:
-                break
         
         return WhileStatement(condition, body)
     
@@ -282,16 +348,25 @@ class Parser:
         self.skip_newlines()
         
         body = []
+        # Track if we've seen at least one statement
+        seen_statement = False
+        
         while self.current_token().type != TokenType.EOF:
             if self.current_token().type == TokenType.NEWLINE:
                 self.advance()
-                if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT]:
+                # After seeing at least one statement, break on top-level declarations
+                if seen_statement and self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.CLASS]:
                     break
                 continue
             stmt = self.parse_statement()
             if stmt:
                 body.append(stmt)
-            if self.current_token().type in [TokenType.VAR, TokenType.FUNC, TokenType.IF, TokenType.PRINT, TokenType.EOF]:
+                seen_statement = True
+                # Stop after return statement
+                if isinstance(stmt, ReturnStatement):
+                    break
+            # Break on new function/class declarations
+            if self.current_token().type in [TokenType.FUNC, TokenType.CLASS, TokenType.EOF]:
                 break
         
         return FunctionDeclaration(name, parameters, body)
@@ -316,6 +391,58 @@ class Parser:
         value = self.parse_expression()
         self.skip_newlines()
         return ReturnStatement(value)
+    
+    def parse_class_declaration(self) -> ClassDeclaration:
+        self.expect(TokenType.CLASS)
+        name = self.expect(TokenType.IDENTIFIER).value
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        
+        methods = []
+        attributes = []
+        
+        while self.current_token().type != TokenType.EOF:
+            if self.current_token().type == TokenType.NEWLINE:
+                self.advance()
+                if self.current_token().type in [TokenType.VAR, TokenType.CLASS, TokenType.FUNC]:
+                    break
+                continue
+            
+            if self.current_token().type == TokenType.FUNC:
+                methods.append(self.parse_function_declaration())
+            elif self.current_token().type == TokenType.VAR:
+                attributes.append(self.parse_var_declaration())
+            else:
+                break
+        
+        return ClassDeclaration(name, methods, attributes)
+    
+    def parse_import_statement(self) -> ImportStatement:
+        self.expect(TokenType.IMPORT)
+        module = self.expect(TokenType.IDENTIFIER).value
+        
+        items = None
+        if self.current_token().type == TokenType.FROM:
+            self.advance()
+            items = []
+            items.append(self.expect(TokenType.IDENTIFIER).value)
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                items.append(self.expect(TokenType.IDENTIFIER).value)
+        
+        self.skip_newlines()
+        return ImportStatement(module, items)
+    
+    def parse_index_assignment(self) -> Assignment:
+        name = self.expect(TokenType.IDENTIFIER).value
+        self.expect(TokenType.LBRACKET)
+        index = self.parse_expression()
+        self.expect(TokenType.RBRACKET)
+        self.expect(TokenType.ASSIGN)
+        value = self.parse_expression()
+        self.skip_newlines()
+        # Return as special assignment with index
+        return Assignment(f"{name}[{index}]", value)
     
     def parse_expression(self) -> ASTNode:
         return self.parse_comparison()
@@ -367,12 +494,34 @@ class Parser:
         elif token.type == TokenType.BOOLEAN:
             self.advance()
             return Boolean(token.value)
+        elif token.type == TokenType.LBRACKET:
+            return self.parse_list_literal()
+        elif token.type == TokenType.LBRACE:
+            return self.parse_dict_literal()
         elif token.type == TokenType.IDENTIFIER:
-            if self.peek_token().type == TokenType.LPAREN:
-                return self.parse_function_call()
+            name = token.value
+            self.advance()
+            
+            # 함수 호출
+            if self.current_token().type == TokenType.LPAREN:
+                self.pos -= 1  # 백트랙
+                result = self.parse_function_call()
             else:
-                self.advance()
-                return Identifier(token.value)
+                result = Identifier(name)
+            
+            # 체이닝된 인덱스/멤버 접근 처리
+            while self.current_token().type in [TokenType.LBRACKET, TokenType.DOT]:
+                if self.current_token().type == TokenType.LBRACKET:
+                    self.advance()
+                    index = self.parse_expression()
+                    self.expect(TokenType.RBRACKET)
+                    result = IndexAccess(result, index)
+                elif self.current_token().type == TokenType.DOT:
+                    self.advance()
+                    member = self.expect(TokenType.IDENTIFIER).value
+                    result = MemberAccess(result, member)
+            
+            return result
         elif token.type == TokenType.LPAREN:
             self.advance()
             expr = self.parse_expression()
@@ -380,3 +529,53 @@ class Parser:
             return expr
         
         raise SyntaxError(f"Unexpected token {token.type} at line {token.line}")
+    
+    def parse_list_literal(self) -> ListLiteral:
+        self.expect(TokenType.LBRACKET)
+        self.skip_newlines()  # Skip newlines after opening bracket
+        elements = []
+        
+        if self.current_token().type != TokenType.RBRACKET:
+            elements.append(self.parse_expression())
+            self.skip_newlines()  # Skip newlines after element
+            
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                self.skip_newlines()  # Skip newlines after comma
+                if self.current_token().type == TokenType.RBRACKET:
+                    break
+                elements.append(self.parse_expression())
+                self.skip_newlines()  # Skip newlines after element
+        
+        self.expect(TokenType.RBRACKET)
+        return ListLiteral(elements)
+    
+    def parse_dict_literal(self) -> DictLiteral:
+        self.expect(TokenType.LBRACE)
+        self.skip_newlines()  # Skip newlines after opening brace
+        pairs = []
+        
+        if self.current_token().type != TokenType.RBRACE:
+            key = self.parse_expression()
+            self.skip_newlines()  # Skip newlines after key
+            self.expect(TokenType.COLON)
+            self.skip_newlines()  # Skip newlines after colon
+            value = self.parse_expression()
+            self.skip_newlines()  # Skip newlines after value
+            pairs.append((key, value))
+            
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                self.skip_newlines()  # Skip newlines after comma
+                if self.current_token().type == TokenType.RBRACE:
+                    break
+                key = self.parse_expression()
+                self.skip_newlines()  # Skip newlines after key
+                self.expect(TokenType.COLON)
+                self.skip_newlines()  # Skip newlines after colon
+                value = self.parse_expression()
+                self.skip_newlines()  # Skip newlines after value
+                pairs.append((key, value))
+        
+        self.expect(TokenType.RBRACE)
+        return DictLiteral(pairs)

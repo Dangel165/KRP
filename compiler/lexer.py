@@ -18,6 +18,9 @@ class TokenType(Enum):
     FOR = auto()          # 반복
     RETURN = auto()       # 반환
     PRINT = auto()        # 보여줘
+    CLASS = auto()        # 클래스
+    IMPORT = auto()       # 가져오기
+    FROM = auto()         # ~에서
     
     # 리터럴
     NUMBER = auto()
@@ -31,6 +34,7 @@ class TokenType(Enum):
     MULTIPLY = auto()     # *
     DIVIDE = auto()       # /
     ASSIGN = auto()       # =
+    DOT = auto()          # .
     
     # 비교 연산자
     EQ = auto()           # ==
@@ -43,6 +47,10 @@ class TokenType(Enum):
     # 구분자
     LPAREN = auto()       # (
     RPAREN = auto()       # )
+    LBRACKET = auto()     # [
+    RBRACKET = auto()     # ]
+    LBRACE = auto()       # {
+    RBRACE = auto()       # }
     COMMA = auto()        # ,
     COLON = auto()        # :
     NEWLINE = auto()
@@ -75,6 +83,9 @@ class Lexer:
             '반복': TokenType.WHILE,
             '반환': TokenType.RETURN,
             '보여줘': TokenType.PRINT,
+            '클래스': TokenType.CLASS,
+            '가져오기': TokenType.IMPORT,
+            '에서': TokenType.FROM,
             '참': TokenType.BOOLEAN,
             '거짓': TokenType.BOOLEAN,
         }
@@ -246,6 +257,21 @@ class Lexer:
                 self.advance()
             elif char == ':':
                 self.tokens.append(Token(TokenType.COLON, ':', line, col))
+                self.advance()
+            elif char == '[':
+                self.tokens.append(Token(TokenType.LBRACKET, '[', line, col))
+                self.advance()
+            elif char == ']':
+                self.tokens.append(Token(TokenType.RBRACKET, ']', line, col))
+                self.advance()
+            elif char == '{':
+                self.tokens.append(Token(TokenType.LBRACE, '{', line, col))
+                self.advance()
+            elif char == '}':
+                self.tokens.append(Token(TokenType.RBRACE, '}', line, col))
+                self.advance()
+            elif char == '.':
+                self.tokens.append(Token(TokenType.DOT, '.', line, col))
                 self.advance()
             else:
                 self.advance()

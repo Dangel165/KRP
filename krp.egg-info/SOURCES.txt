@@ -1,7 +1,7 @@
-LICENSE
 MANIFEST.in
 README.md
 ide.py
+krp_pkg.py
 main.py
 pyproject.toml
 requirements.txt
@@ -11,12 +11,16 @@ compiler/codegen.py
 compiler/interpreter.py
 compiler/lexer.py
 compiler/parser.py
+examples/class_example.한글
 examples/conditional.한글
+examples/dict_example.한글
 examples/fibonacci.한글
 examples/hello.한글
+examples/list_example.한글
 examples/loop.한글
 examples/loop_test.한글
 examples/numeric_vars.한글
+examples/stdlib_example.한글
 grammar/Korean.g4
 krp.egg-info/PKG-INFO
 krp.egg-info/SOURCES.txt

@@ -1,3 +1,4 @@
 [console_scripts]
 krp = main:main
 krp-ide = ide:main
+krp-pkg = krp_pkg:main

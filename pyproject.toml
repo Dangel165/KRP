@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "krp"
-version = "2.0.0"
+version = "3.0.0"
 description = "KRP (Korean Programming Language) - 한국어 프로그래밍 언어"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -31,6 +31,7 @@ all = ["llvmlite>=0.40.0"]
 [project.scripts]
 krp = "main:main"
 krp-ide = "ide:main"
+krp-pkg = "krp_pkg:main"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/krp"
@@ -38,6 +39,6 @@ Documentation = "https://github.com/yourusername/krp/blob/main/README.md"
 Repository = "https://github.com/yourusername/krp"
 
 [tool.setuptools]
-py-modules = ["main", "ide"]
+py-modules = ["main", "ide", "krp_pkg"]
 packages = ["compiler"]
 include-package-data = true

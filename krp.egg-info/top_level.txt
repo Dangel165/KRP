@@ -1,3 +1,4 @@
 compiler
 ide
+krp_pkg
 main
